@@ -17,7 +17,7 @@ def register():
     # Registrar o usuário
     register_user(data['email'], data['password'])
 
-    return jsonify({'message': 'Usuário registrado com sucesso'}), 201
+    return jsonify({'message': 'Usuário registrado com sucesso'}), 200
 
 # Rota para login
 @auth_bp.route('/login', methods=['POST'])
