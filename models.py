@@ -47,6 +47,52 @@ class Extintor:
         finally:
             cursor.close()
             conn.close()
+            
+    @staticmethod
+    def atualizar(dados):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        sql = """
+            UPDATE Extintores
+            SET Tipo = %s, Capacidade = %s, Codigo_Fabricante = %s, Data_Fabricacao = %s,
+                Data_Validade = %s, Ultima_Recarga = %s, Proxima_Inspecao = %s, Status = %s,
+                ID_Localizacao = %s, QR_Code = %s, Observacoes = %s
+            WHERE Patrimonio = %s
+        """
+        valores = (
+            dados['tipo'], dados['capacidade'], dados['codigo_fabricante'],
+            dados['data_fabricacao'], dados['data_validade'], dados['ultima_recarga'],
+            dados['proxima_inspecao'], dados['status'], dados['id_localizacao'],
+            dados['qr_code'], dados.get('observacoes', ''), dados['patrimonio']
+        )
+        
+        try:
+            cursor.execute(sql, valores)
+            conn.commit()
+            return True, "Extintor atualizado com sucesso."
+        except mysql.connector.Error as err:
+            return False, f"Erro ao atualizar o extintor: {str(err)}"
+        finally:
+            cursor.close()
+            conn.close()
+    
+    @staticmethod
+    def deletar(patrimonio):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        sql = "DELETE FROM Extintores WHERE Patrimonio = %s"
+        
+        try:
+            cursor.execute(sql, (patrimonio,))
+            conn.commit()
+            return True, "Extintor deletado com sucesso."
+        except mysql.connector.Error as err:
+            return False, f"Erro ao deletar o extintor: {str(err)}"
+        finally:
+            cursor.close()
+            conn.close()
 
 # Função para registrar um novo usuário
 def register_user(email, password):
