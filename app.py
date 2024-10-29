@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from config import Config
 from auth import auth_bp
+from routes import equipamento_bp
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -14,6 +15,7 @@ jwt = JWTManager(app)
 
 # Registrar Blueprint de autenticação
 app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(equipamento_bp, url_prefix='/equipamento')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
