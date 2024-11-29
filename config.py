@@ -10,5 +10,12 @@ class Config:
     MYSQL_USER = os.getenv('MYSQL_USER')
     MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
     MYSQL_DB = os.getenv('MYSQL_DB')
+    
+    # Configurações do JWT
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     SECRET_KEY = os.getenv('SECRET_KEY')
+    
+    # Configurações do MongoDB
+    MONGO_URI = os.getenv("MONGO_URI")
+    MONGO_DB_NAME = os.getenv("MONGO_DB_NAME")
+

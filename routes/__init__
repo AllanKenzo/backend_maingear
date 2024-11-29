@@ -1,0 +1,6 @@
+from flask import Blueprint
+from .equipamento import equipamento_bp
+from .relatorio import relatorio_bp
+
+# Lista de blueprints para registro em app.py
+blueprints = [equipamento_bp, relatorio_bp]
