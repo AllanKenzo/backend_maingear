@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, send_file
-from services.report_service import save_report_to_db, retrieve_report_from_db
+from services.report_service import insert_report_to_db, devolver_todos_relatorios, inserir_relatorio_por_status, inserir_relatorio_por_localizacao, inserir_relatorio_por_validade
 
 relatorio_bp = Blueprint("relatorio", __name__)
 
@@ -33,8 +33,50 @@ def upload_relatorio():
     try:
         file_path = f"./temp/{file.filename}"
         file.save(file_path)  # Salvar temporariamente o arquivo
-        save_report_to_db(file_path, metadata)
+        insert_report_to_db(file_path, metadata)
         return jsonify({"message": "Relatório salvo com sucesso"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@relatorio_bp.route('/relatorio_status', methods=['GET'])
+def fazer_relatorio_por_status(status):
+    """Endpoint para gerar um relatório de extintores por status"""
+    try:
+        relatorio = inserir_relatorio_por_status(status)
+        if not relatorio:
+            return jsonify({"error": "Nenhum extintor encontrado para esse status"}), 404
+        return jsonify({"message": "Relatório gerado com sucesso"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@relatorio_bp.route('/relatorio_validade', methods=['GET'])
+def fazer_relatorio_por_validade(data_validade):
+    """Endpoint para gerar um relatório de extintores por data de validade"""
+    try:
+        relatorio = inserir_relatorio_por_validade(data_validade)
+        if not relatorio:
+            return jsonify({"error": "Nenhum extintor encontrado para essa data de validade"}), 404
+        return jsonify({"message": "Relatório gerado com sucesso"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@relatorio_bp.route('/relatorio_localizacao', methods=['GET'])
+def fazer_relatorio_por_localizacao(id_localizacao):
+    """Endpoint para gerar um relatório de extintores por localização"""
+    try:
+        relatorio = inserir_relatorio_por_localizacao(id_localizacao)
+        if not relatorio:
+            return jsonify({"error": "Nenhum extintor encontrado para essa localização"}), 404
+        return jsonify({"message": "Relatório gerado com sucesso"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@relatorio_bp.route('/buscar_todos_relatorios', methods=['GET'])
+def buscar_todos_relatorios():
+    """Endpoint para buscar todos os relatórios salvos no banco de dados"""
+    try:
+        relatorios = devolver_todos_relatorios()
+        return jsonify(relatorios), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -49,3 +91,4 @@ def download_relatorio(id_relatorio):
         return send_file(output_path, as_attachment=True, download_name=relatorio["arquivo"]["nome"])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    

@@ -93,6 +93,87 @@ class Extintor:
         finally:
             cursor.close()
             conn.close()
+            
+    @staticmethod
+    def buscar_por_id(patrimonio):
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        sql = "SELECT * FROM Extintores WHERE Patrimonio = %s"
+        
+        cursor.execute(sql, (patrimonio,))
+        extintor = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        return extintor
+    
+    @staticmethod
+    def buscar_por_localizacao(id_localizacao):
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        sql = "SELECT * FROM Extintores WHERE ID_Localizacao = %s"
+        
+        cursor.execute(sql, (id_localizacao,))
+        extintores = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return extintores
+    
+    @staticmethod
+    def buscar_por_validade(data_validade):
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        sql = "SELECT * FROM Extintores WHERE Data_Validade = %s"
+        
+        cursor.execute(sql, (data_validade,))
+        extintores = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return extintores
+    
+    @staticmethod
+    def buscar_por_status(status):#lembrar de mandar uma string do status corretamente
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        sql = "SELECT * FROM Extintores WHERE Status = %s"
+        
+        cursor.execute(sql, (status,))
+        extintores = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return extintores
+    
+    @staticmethod
+    def buscar_todos_perto_validade():#para relatorios
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        data_atual = datetime.now().strftime('%Y-%m-%d')
+        
+        sql = """
+            SELECT Patrimonio 
+            FROM Extintores 
+            WHERE Data_Validade BETWEEN %s AND DATE_ADD(%s, INTERVAL 7 DAY)
+        """
+        
+        cursor.execute(sql, (data_atual, data_atual))
+        extintores = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return [extintor['Patrimonio'] for extintor in extintores]
 
 # Função para registrar um novo usuário
 def register_user(email, password):

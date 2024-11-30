@@ -54,3 +54,34 @@ def deletar_extintor(patrimonio):
         return jsonify({"mensagem": mensagem}), 200
     else:
         return jsonify({"erro": mensagem}), 500
+    
+@equipamento_bp.route('/buscar_extintor_por_id', methods=['GET'])
+def buscar_por_id(patrimonio):
+    extintor = Extintor.buscar_por_id(patrimonio)
+    if extintor:
+        return jsonify(extintor), 200
+    else:
+        return jsonify({"erro": "Extintor não encontrado"}), 404
+
+@equipamento_bp.route('/buscar_extintor_por_localizacao', methods=['GET'])
+def buscar_por_localizacao():
+    id_localizacao = request.args.get('id_localizacao')
+    extintores = Extintor.buscar_por_localizacao(id_localizacao)
+    return jsonify(extintores), 200
+
+@equipamento_bp.route('/buscar_extintor_por_data_validade', methods=['GET'])
+def buscar_por_data_validade():
+    data_validade = request.args.get('data_validade')
+    extintores = Extintor.buscar_por_validade(data_validade)
+    return jsonify(extintores), 200
+
+@equipamento_bp.route('/buscar_extintor_por_status', methods=['GET'])
+def buscar_por_status():
+    status = request.args.get('status')#lembrar de receber uma string com algum status válido
+    extintores = Extintor.buscar_por_status(status)
+    return jsonify(extintores), 200
+
+@equipamento_bp.route('/buscar_extintores_perto_validade', methods=['GET'])
+def buscar_perto_validade():
+    extintores = Extintor.buscar_todos_perto_validade()
+    return jsonify(extintores), 200
