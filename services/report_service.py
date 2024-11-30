@@ -32,7 +32,6 @@ def insert_report_to_db(metadata):
     client = None
     try:
         document = {
-            "id_relatorio": metadata["id_relatorio"],
             "tipo_relatorio": metadata["tipo_relatorio"],
             "descricao": metadata["descricao"],
             "data_geracao": metadata["data_geracao"],

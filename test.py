@@ -1,6 +1,15 @@
-from services.report_service import insert_report_to_db, inserir_relatorio_por_status, inserir_relatorio_por_localizacao, inserir_relatorio_por_validade
-from flask import Blueprint, request, jsonify, send_file
+from pymongo import MongoClient
 
-relatorio_bp = Blueprint("relatorio", __name__)
+# Substitua pela sua URL de conexão
+client = MongoClient("mongodb://localhost:27017")
+db = client["relatoriosdb"]  # Substitua pelo nome do seu banco
+collection = db["relatorios"]  # Substitua pelo nome da sua coleção
 
-inserir_relatorio_por_status("ativo")
+# Busca todos os documentos e exibe as chaves e valores
+for doc in collection.find():
+    print("Documento:")
+    for key, value in doc.items():
+        print(f"  {key}: {value}")
+    print("-" * 40)  # Separador entre documentos
+
+client.close()
