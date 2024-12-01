@@ -85,3 +85,11 @@ def buscar_por_status():
 def buscar_perto_validade():
     extintores = Extintor.buscar_todos_perto_validade()
     return jsonify(extintores), 200
+
+@equipamento_bp.route('/buscar_todos_extintores', methods=['GET'])
+def buscar_todos_extintores():
+    try:
+        extintores = Extintor.buscar_todos()
+        return jsonify(extintores), 200
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
