@@ -11,7 +11,7 @@ def cadastrar_extintor():
     campos_obrigatorios = [
         'patrimonio', 'tipo', 'capacidade', 'codigo_fabricante', 'data_fabricacao',
         'data_validade', 'ultima_recarga', 'proxima_inspecao', 'status',
-        'id_localizacao', 'qr_code'
+        'id_localizacao'
     ]
     
     for campo in campos_obrigatorios:
@@ -84,4 +84,9 @@ def buscar_por_status():
 @equipamento_bp.route('/buscar_extintores_perto_validade', methods=['GET'])
 def buscar_perto_validade():
     extintores = Extintor.buscar_todos_perto_validade()
+    return jsonify(extintores), 200
+
+@equipamento_bp.route('/buscar_todos_extintores', methods=['GET'])
+def buscar_todos():
+    extintores = Extintor.buscar_todos()
     return jsonify(extintores), 200

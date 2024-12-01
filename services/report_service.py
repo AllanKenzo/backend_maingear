@@ -1,4 +1,6 @@
 from datetime import datetime
+from flask import jsonify, send_file
+from config import Config
 from models import Extintor
 from services.pdf_service import encode_pdf_to_base64, decode_base64_to_pdf
 from services.db_service import get_mongo_connection
@@ -11,9 +13,8 @@ import os
 
 load_dotenv()
 
-client = MongoClient('mongodb://localhost:27017')
-db = client['relatoriosdb']
-collection = db['relatorios']
+client, collection = get_mongo_connection()
+
 
 def montar_pdf(pdf_file, extintores):
     for extintor in extintores:
@@ -29,7 +30,6 @@ def montar_pdf(pdf_file, extintores):
         pdf_file.write(f"Código do Fabricante: {extintor['Codigo_Fabricante']}\n\n")
 
 def insert_report_to_db(metadata):
-    client = None
     try:
         document = {
             "tipo_relatorio": metadata["tipo_relatorio"],
@@ -178,3 +178,20 @@ def inserir_relatorio_por_status(status):
 
     # Salvar o relatório no banco de dados
     return insert_report_to_db(metadata)
+
+def baixar_pdf(id):
+    print(f"Received ID: {id}")  # Log the received ID
+    try:
+        documento = collection.find_one({'_id': ObjectId(id)})
+        if not documento:
+            return id, 404
+
+        # Decode the PDF file
+        pdf_data = decode_base64_to_pdf(documento['arquivo']['conteudo'])
+        return pdf_data
+    except Exception as e:
+        print(f"Erro ao buscar relatório no MongoDB: {e}")
+        return None
+    finally:
+        if client:
+            client.close()

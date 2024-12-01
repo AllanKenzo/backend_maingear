@@ -1,5 +1,7 @@
-from flask import Blueprint, request, jsonify, send_file
-from services.report_service import insert_report_to_db, devolver_todos_relatorios, inserir_relatorio_por_status, inserir_relatorio_por_localizacao, inserir_relatorio_por_validade
+from flask import Blueprint, request, jsonify, send_file, Response
+from services.report_service import insert_report_to_db, inserir_relatorio_por_status, inserir_relatorio_por_validade, inserir_relatorio_por_localizacao, devolver_todos_relatorios, baixar_pdf
+from services.pdf_service import decode_base64_to_pdf,encode_pdf_to_base64
+
 
 relatorio_bp = Blueprint("relatorio", __name__)
 
@@ -38,6 +40,8 @@ def upload_relatorio():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+# Precisa de um botão para fazer o relatório e um botão para baixar o relatório
 @relatorio_bp.route('/relatorio_status', methods=['GET'])
 def fazer_relatorio_por_status(status):
     """Endpoint para gerar um relatório de extintores por status"""
@@ -49,6 +53,8 @@ def fazer_relatorio_por_status(status):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+# Possivelmente para cada um dos tipos de relatórios
 @relatorio_bp.route('/relatorio_validade', methods=['GET'])
 def fazer_relatorio_por_validade(data_validade):
     """Endpoint para gerar um relatório de extintores por data de validade"""
@@ -59,6 +65,8 @@ def fazer_relatorio_por_validade(data_validade):
         return jsonify({"message": "Relatório gerado com sucesso"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 @relatorio_bp.route('/relatorio_localizacao', methods=['GET'])
 def fazer_relatorio_por_localizacao(id_localizacao):
@@ -71,6 +79,8 @@ def fazer_relatorio_por_localizacao(id_localizacao):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+#Para aparecer na tela de relatórios, ainda a determinar limite de relatorios
 @relatorio_bp.route('/buscar_todos_relatorios', methods=['GET'])
 def buscar_todos_relatorios():
     """Endpoint para buscar todos os relatórios salvos no banco de dados"""
@@ -80,15 +90,20 @@ def buscar_todos_relatorios():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@relatorio_bp.route('/download/<id_relatorio>', methods=['GET'])
-def download_relatorio(id_relatorio):
-    """Endpoint para baixar um relatório PDF"""
+
+#
+@relatorio_bp.route('/baixar_relatorio/<id>', methods=['POST'])#na url é passado o id do relatório, lembrar 
+def baixar_relatorio(id):
+    print(f"Received ID: {id}")
+    """Retorna um link do PDF decodificado pelo ID"""
     try:
-        output_path = f"./temp/{id_relatorio}.pdf"
-        relatorio = retrieve_report_from_db(id_relatorio, output_path)
-        if not relatorio:
-            return jsonify({"error": "Relatório não encontrado"}), 404
-        return send_file(output_path, as_attachment=True, download_name=relatorio["arquivo"]["nome"])
+        # Busca o documento no banco de dados
+        pdf_data = baixar_pdf(id)
+
+        # Retorna como resposta binária
+        return Response(pdf_data, mimetype='application/pdf', headers={
+            "Content-Disposition": f"inline; filename=relatorio_{id}.pdf"
+        })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
+        return jsonify({'error': str(e)}), 500
+
