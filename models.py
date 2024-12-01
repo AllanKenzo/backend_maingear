@@ -177,19 +177,22 @@ class Extintor:
         return [extintor['Patrimonio'] for extintor in extintores]
     
     @staticmethod
-    def buscar_todos():
+    def buscar_todos(): #Buscar todos os extintores
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
         sql = "SELECT * FROM Extintores"
         
-        cursor.execute(sql)
-        extintores = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-        
-        return extintores
+        try:
+            cursor.execute(sql)
+            extintores = cursor.fetchall()
+            return extintores
+        except mysql.connector.Error as err:
+            print(f"Erro ao buscar extintores: {str(err)}")
+            return []
+        finally:
+            cursor.close()
+            conn.close()
 
 # Função para registrar um novo usuário
 def register_user(email, password):
