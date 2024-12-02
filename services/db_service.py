@@ -8,7 +8,6 @@ def get_mongo_connection():
         client = MongoClient(uri)
         db = client[Config.MONGO_DB_NAME]
         collection = db[Config.MONGO_COLLECTION_NAME]
-        return db, collection
+        return client, collection
     except Exception as e:
-        print(f"Erro ao conectar ao MongoDB: {e}")
-        raise
+        print(f"Erro ao conectar ao MongoDB: {e}"); raise
