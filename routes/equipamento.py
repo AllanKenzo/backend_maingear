@@ -14,9 +14,9 @@ def cadastrar_extintor():
         'id_localizacao'
     ]
     
-    for campo in campos_obrigatorios:
-        if campo not in dados or not dados[campo]:
-            return jsonify({"erro": f"O campo {campo} é obrigatório."}), 400
+    campos_faltantes = [campo for campo in campos_obrigatorios if campo not in dados or not dados[campo]]
+    if campos_faltantes:
+        return jsonify({"erro": f"Os campos {', '.join(campos_faltantes)} são obrigatórios."}), 400
 
     sucesso, mensagem = Extintor.cadastrar(dados)
     if sucesso:

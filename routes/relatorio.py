@@ -5,44 +5,24 @@ from services.pdf_service import decode_base64_to_pdf,encode_pdf_to_base64
 
 relatorio_bp = Blueprint("relatorio", __name__)
 
-@relatorio_bp.route('/upload', methods=['POST'])
+@relatorio_bp.route('/upload_relatorio', methods=['POST'])
 def upload_relatorio():
     """Endpoint para fazer upload de um relatório PDF"""
-    if 'file' not in request.files:
-        return jsonify({"error": "Nenhum arquivo enviado"}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "Arquivo não especificado"}), 400
-
-    # Metadados básicos do relatório
-    metadata = {
-        "id_relatorio": request.form.get("id_relatorio"),
-        "tipo_relatorio": request.form.get("tipo_relatorio"),
-        "descricao": request.form.get("descricao"),
-        "data_geracao": request.form.get("data_geracao"),
-        "periodo": {
-            "inicio": request.form.get("periodo_inicio"),
-            "fim": request.form.get("periodo_fim")
-        },
-        "arquivo_nome": file.filename,
-        "metadados": {
-            "total_extintores": int(request.form.get("total_extintores", 0))
-        }
-    }
-
-    # Salvar o relatório no banco de dados
     try:
-        file_path = f"./temp/{file.filename}"
-        file.save(file_path)  # Salvar temporariamente o arquivo
-        insert_report_to_db(file_path, metadata)
-        return jsonify({"message": "Relatório salvo com sucesso"}), 201
+        # Get JSON body from the request
+        metadata = request.get_json()
+        if not metadata:
+            return jsonify({"error": "Metadados não fornecidos"}), 400
+
+        # Insert report into the database
+        id_inserido = insert_report_to_db(metadata)
+        return jsonify({"message": f"Relatório {id_inserido} salvo com sucesso"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
 # Precisa de um botão para fazer o relatório e um botão para baixar o relatório
-@relatorio_bp.route('/relatorio_status', methods=['GET'])
+@relatorio_bp.route('/relatorio_status/<status>', methods=['GET'])
 def fazer_relatorio_por_status(status):
     """Endpoint para gerar um relatório de extintores por status"""
     try:
@@ -56,10 +36,10 @@ def fazer_relatorio_por_status(status):
 
 # Possivelmente para cada um dos tipos de relatórios
 @relatorio_bp.route('/relatorio_validade', methods=['GET'])
-def fazer_relatorio_por_validade(data_validade):
+def fazer_relatorio_por_validade():
     """Endpoint para gerar um relatório de extintores por data de validade"""
     try:
-        relatorio = inserir_relatorio_por_validade(data_validade)
+        relatorio = inserir_relatorio_por_validade()
         if not relatorio:
             return jsonify({"error": "Nenhum extintor encontrado para essa data de validade"}), 404
         return jsonify({"message": "Relatório gerado com sucesso"}), 200
@@ -68,7 +48,7 @@ def fazer_relatorio_por_validade(data_validade):
 
 
 
-@relatorio_bp.route('/relatorio_localizacao', methods=['GET'])
+@relatorio_bp.route('/relatorio_localizacao/<id_localizacao>', methods=['GET'])
 def fazer_relatorio_por_localizacao(id_localizacao):
     """Endpoint para gerar um relatório de extintores por localização"""
     try:

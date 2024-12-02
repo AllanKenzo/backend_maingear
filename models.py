@@ -35,7 +35,7 @@ class Extintor:
             dados['patrimonio'], dados['tipo'], dados['capacidade'], dados['codigo_fabricante'],
             dados['data_fabricacao'], dados['data_validade'], dados['ultima_recarga'],
             dados['proxima_inspecao'], dados['status'], dados['id_localizacao'],
-            dados.get('qr_code', ''), dados.get('observacoes', None)
+            dados.get('qr_code', None), dados.get('observacoes', None)
         )
         
         try:

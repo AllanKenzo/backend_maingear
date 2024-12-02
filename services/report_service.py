@@ -30,16 +30,17 @@ def montar_pdf(pdf_file, extintores):
         pdf_file.write(f"Código do Fabricante: {extintor['Codigo_Fabricante']}\n\n")
 
 def insert_report_to_db(metadata):
+    client = None
     try:
         document = {
-            "tipo_relatorio": metadata["tipo_relatorio"],
-            "descricao": metadata["descricao"],
-            "data_geracao": metadata["data_geracao"],
+            "tipo_relatorio": metadata.get("tipo_relatorio"),
+            "descricao": metadata.get("descricao"),
+            "data_geracao": metadata.get("data_geracao"),
             "arquivo": {
-                "nome": metadata["arquivo"]["nome"],
-                "conteudo": metadata["arquivo"]["conteudo"]
+                "nome": metadata.get("arquivo", {}).get("nome"),
+                "conteudo": metadata.get("arquivo", {}).get("conteudo")
             },
-            "metadados": metadata["metadados"]
+            "metadados": metadata.get("metadados")
         }
         
         # Insere o documento no banco de dados
@@ -83,6 +84,7 @@ def inserir_relatorio_por_localizacao(id_localizacao):
         return False, "Nenhum extintor encontrado para essa localização"
 
     # Gerar conteúdo do relatório
+    create_temp_folder()
     pdf_path = f"./temp/relatorio_{id_localizacao}_{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.pdf"
     with open(pdf_path, "w") as pdf_file:
         pdf_file.write("Relatório de Extintores por Localização\n\n")
@@ -107,8 +109,8 @@ def inserir_relatorio_por_localizacao(id_localizacao):
         }
     }
 
+    insert_report_to_db(metadata)
     # Salvar o relatório no banco de dados
-    return insert_report_to_db(metadata)
 
 def inserir_relatorio_por_validade():
     """Gera um relatório de extintores por data de validade."""
@@ -119,6 +121,7 @@ def inserir_relatorio_por_validade():
         return False, "Nenhum extintor encontrado para essa data de validade"
 
     # Gerar conteúdo do relatório
+    create_temp_folder()
     pdf_path = f"./temp/relatorio_{data}.pdf"
     with open(pdf_path, "w") as pdf_file:
         pdf_file.write("Relatório de Extintores por Data de Validade\n\n")
@@ -153,6 +156,7 @@ def inserir_relatorio_por_status(status):
         return False, "Nenhum extintor encontrado para esse status"
 
     # Gerar conteúdo do relatório
+    create_temp_folder()
     pdf_path = f"./temp/relatorio_{status}_{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.pdf"
     with open(pdf_path, "w") as pdf_file:
         pdf_file.write("Relatório de Extintores por Status\n\n")
@@ -195,3 +199,9 @@ def baixar_pdf(id):
     finally:
         if client:
             client.close()
+            
+def create_temp_folder():
+    temp_folder_path = os.path.join(os.path.dirname(__file__), '..', 'temp')
+    if not os.path.exists(temp_folder_path):
+        os.makedirs(temp_folder_path)
+    return temp_folder_path
