@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, send_file, Response
 from services.report_service import insert_report_to_db, inserir_relatorio_por_status, inserir_relatorio_por_validade, inserir_relatorio_por_localizacao, devolver_todos_relatorios, baixar_pdf
 from services.pdf_service import decode_base64_to_pdf,encode_pdf_to_base64
+import base64
 
 
 relatorio_bp = Blueprint("relatorio", __name__)
