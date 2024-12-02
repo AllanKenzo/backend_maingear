@@ -3,7 +3,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-metadata = {
+{
     "tipo_relatorio": "mensal",
     "descricao": "Relatório mensal de extintores",
     "data_geracao": "2024-12-01",

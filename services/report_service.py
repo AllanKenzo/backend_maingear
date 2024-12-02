@@ -80,8 +80,6 @@ def inserir_relatorio_por_localizacao(id_localizacao):
     """Gera um relatório de extintores por localização."""
     # Buscar extintores por localização
     extintores = Extintor.buscar_por_localizacao(id_localizacao)
-    if not extintores:
-        return False, "Nenhum extintor encontrado para essa localização"
 
     # Gerar conteúdo do relatório
     create_temp_folder()
@@ -185,17 +183,18 @@ def inserir_relatorio_por_status(status):
 
 def baixar_pdf(id):
     print(f"Received ID: {id}")  # Log the received ID
+    client = None
     try:
         documento = collection.find_one({'_id': ObjectId(id)})
         if not documento:
-            return id, 404
+            return jsonify({'error': 'Relatório não encontrado'}), 404
 
         # Decode the PDF file
         pdf_data = decode_base64_to_pdf(documento['arquivo']['conteudo'])
-        return pdf_data
+        return send_file(pdf_data, mimetype='application/pdf', as_attachment=True, download_name='relatorio.pdf')
     except Exception as e:
         print(f"Erro ao buscar relatório no MongoDB: {e}")
-        return None
+        return jsonify({'error': 'Erro ao buscar relatório'}), 500
     finally:
         if client:
             client.close()

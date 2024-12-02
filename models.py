@@ -115,9 +115,11 @@ class Extintor:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
+        id_loc = str(id_localizacao)
+        
         sql = "SELECT * FROM Extintores WHERE ID_Localizacao = %s"
         
-        cursor.execute(sql, (id_localizacao,))
+        cursor.execute(sql, (id_loc,))
         extintores = cursor.fetchall()
         
         cursor.close()

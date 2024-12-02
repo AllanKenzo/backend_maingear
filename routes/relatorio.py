@@ -72,18 +72,13 @@ def buscar_todos_relatorios():
 
 
 #
-@relatorio_bp.route('/baixar_relatorio/<id>', methods=['POST'])#na url é passado o id do relatório, lembrar 
+@relatorio_bp.route('/baixar_relatorio/<id>', methods=['GET'])#na url é passado o id do relatório, lembrar 
 def baixar_relatorio(id):
     print(f"Received ID: {id}")
     """Retorna um link do PDF decodificado pelo ID"""
     try:
         # Busca o documento no banco de dados
-        pdf_data = baixar_pdf(id)
-
-        # Retorna como resposta binária
-        return Response(pdf_data, mimetype='application/pdf', headers={
-            "Content-Disposition": f"inline; filename=relatorio_{id}.pdf"
-        })
+        return baixar_pdf(id)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
