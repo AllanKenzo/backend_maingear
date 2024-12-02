@@ -160,10 +160,10 @@ class Extintor:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        data_atual = datetime.now().strftime('%Y-%m-%d')
+        data_atual = datetime.now().date()
         
         sql = """
-            SELECT Patrimonio 
+            SELECT * 
             FROM Extintores 
             WHERE Data_Validade BETWEEN %s AND DATE_ADD(%s, INTERVAL 7 DAY)
         """
@@ -174,7 +174,7 @@ class Extintor:
         cursor.close()
         conn.close()
         
-        return [extintor['Patrimonio'] for extintor in extintores]
+        return extintores
     
     @staticmethod
     def buscar_todos(): #Buscar todos os extintores
