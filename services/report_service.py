@@ -192,7 +192,7 @@ def inserir_relatorio_por_status(status):
 
     # Gerar conteúdo do relatório
     create_temp_folder()
-    pdf_path = f"./temp/relatorio_{status}_{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.pdf"
+    pdf_path = f"./temp/relatorio_{status}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.pdf"
 
     montar_pdf(pdf_path, extintores)
 
