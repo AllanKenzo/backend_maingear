@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify, send_file, Response
 from services.report_service import insert_report_to_db, inserir_relatorio_por_status, inserir_relatorio_por_validade, inserir_relatorio_por_localizacao, devolver_todos_relatorios, baixar_pdf
 from services.pdf_service import decode_base64_to_pdf,encode_pdf_to_base64
-
-
+from bson import ObjectId
+from services.db_service import get_mongo_connection
 relatorio_bp = Blueprint("relatorio", __name__)
 
 @relatorio_bp.route('/upload_relatorio', methods=['POST'])
@@ -82,3 +82,28 @@ def baixar_relatorio(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@relatorio_bp.route('/deletar_relatorio/<report_id>', methods=['POST'])
+def deletar_relatorio(report_id):
+    """Endpoint para deletar um relatório do banco de dados."""
+    client, collection = get_mongo_connection()  # Obter a conexão e a coleção
+    try:
+        # Valida o ID do relatório
+        if not ObjectId.is_valid(report_id):
+            return jsonify({'error': 'ID inválido'}), 400
+
+        # Deleta o relatório do banco de dados
+        result = collection.delete_one({'_id': ObjectId(report_id)})
+
+        # Verifica se algum relatório foi deletado
+        if result.deleted_count == 0:
+            return jsonify({'error': 'Relatório não encontrado'}), 404
+
+        return jsonify({'message': 'Relatório deletado com sucesso'}), 200
+    except Exception as e:
+        print(f"Erro ao deletar relatório no MongoDB: {e}")
+        return jsonify({'error': 'Erro ao deletar o relatório'}), 500
+    finally:
+        # Fecha a conexão com o banco de dados
+        if client:
+            client.close()
