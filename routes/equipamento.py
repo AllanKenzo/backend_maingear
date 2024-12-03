@@ -24,11 +24,10 @@ def cadastrar_extintor():
     else:
         return jsonify({"erro": mensagem}), 500
 
-@equipamento_bp.route('/atualizar_extintor', methods=['PUT'])
+@equipamento_bp.route('/atualizar_extintor/<patrimonio>', methods=['PUT'])
 def atualizar_extintor(patrimonio):
     dados = request.json
 
-    # Validação de campos obrigatórios
     campos_obrigatorios = [
         'tipo', 'capacidade', 'codigo_fabricante', 'data_fabricacao',
         'data_validade', 'ultima_recarga', 'proxima_inspecao', 'status',
@@ -36,7 +35,7 @@ def atualizar_extintor(patrimonio):
     ]
     
     for campo in campos_obrigatorios:
-        if campo not in dados or not dados[campo]:
+        if not dados.get(campo):
             return jsonify({"erro": f"O campo {campo} é obrigatório."}), 400
 
     dados['patrimonio'] = patrimonio
@@ -46,6 +45,7 @@ def atualizar_extintor(patrimonio):
         return jsonify({"mensagem": mensagem}), 200
     else:
         return jsonify({"erro": mensagem}), 500
+
     
 @equipamento_bp.route('/deletar_extintor', methods=['DELETE'])
 def deletar_extintor(patrimonio):
